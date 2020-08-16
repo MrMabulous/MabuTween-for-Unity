@@ -14,7 +14,36 @@ public class MabuTweenExample : MonoBehaviour
   // Start is called before the first frame update
   void Start()
   {
+    // general usage is: Tween(what, duration, to, [from], [easingFunction], [loopType], [getterFunction])
+    //
+    // @what defines the value that should be animated. It can can either be a tuple (object, propertyname) or a
+    //       setter function of type SetterFunction<T> that takes one argument of type T (in the range of @from to @to)
+    //       and does something with it.
+    // @duration is the duration of the tween in seconds.
+    // @to is the target value to which the value should be animated.
+    // @from defines the value at which the animation should start. It can take one of three types:
+    //       - a value of type T, in this case that value will be set as the start
+    //       - null, in which case the start value is taken from the value the property will have when the tween is
+    //               started. This only works when @what is an (object, propertyname) tuple, not when it is a
+    //               setter function of type SetterFunction<T>
+    //       - a getter function of type GetterFunction<T>. It will be evaluated when the tween starts to get the start
+    //               value.
+    // @easingFunction one of many different easing functions defining motion curve. See https://easings.net/
+    //                 can be null, in which case sinusoidal ease-in-ease-out is used.
+    // @loopType defines what happens when the tween reaches the end. Possible Values are
+    //           - LoopType.Dont (the default): doesn't loop, the tween ends when it reaches the to value.
+    //           - LoopType.Loop: repeats the tween forwever, starting at the beginning with each loop
+    //           - LoopType.Reflect: After reaching the end, animates in reverse back to the start and ends then.
+    //           - LoopType.PingPong: Animates continuously forwards, then backwards etc.
+    // @getterFunction this is usually not required. it is only required when the @what of a subtween is defined using a
+    //                 setter function rather than a (object, propertyname) tuple AND the @from is NOT already of type
+    //                 GetterFunction<T> but a fixed value of type T AND the subtween is concatenated with other
+    //                 subtweens and might animated backwards (this is so the tween can query the value of the animated
+    //                 value before the tween starts, so that it can set it back there when animating in reverse).
+
     // build one long tween by creating and concatinating many individual tweens using + and += operator.
+
+    // smooth motion
     Mabu.TweenHandle tween = Mabu.Tween((transform, "position"), 1.0f, new Vector3(0, 1, 0)) +
                              Mabu.Tween((transform, "position"), 1.0f, new Vector3(1, 1, 0)) +
                              Mabu.Tween((transform, "position"), 1.0f, new Vector3(1, 1, 1)) +
@@ -60,18 +89,11 @@ public class MabuTweenExample : MonoBehaviour
              new WaitForSeconds(0.3f);
         
     // animate color
-    // specify custom setter function for the variable you want to animate.
-    Mabu.SetterFunction<Color> colorsetter = (Color col) => {
-      gameObject.GetComponent<Renderer>().material.SetColor("_Color", col);
-    };
-    Mabu.GetterFunction<Color> colorgetter = () => {
-      return gameObject.GetComponent<Renderer>().material.GetColor("_Color");
-    };
-    Color current_color = colorgetter();
-    tween += Mabu.Tween(colorsetter, 1.0f, Color.red, colorgetter) +  // fade to red
-              Mabu.Tween(colorsetter, 1.0f, Color.blue, colorgetter) +  // fade to blue
-              Mabu.Tween(colorsetter, 1.0f, current_color, colorgetter) +  // fade to previous color
-              new WaitForSeconds(0.3f);
+    Color current_color = material.color;
+    tween += Mabu.Tween((material, "color"), 1.0f, Color.red) +      // fade to red
+             Mabu.Tween((material, "color"), 1.0f, Color.blue) +     // fade to blue
+             Mabu.Tween((material, "color"), 1.0f, current_color) +  // fade to previous color
+             new WaitForSeconds(0.3f);
 
     // animate some vertices
     // specify custom setter function that sets multiple vertices.
