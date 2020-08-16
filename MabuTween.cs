@@ -147,19 +147,29 @@ public static class Mabu
     Reverse = -1
   }
 
-  public static TweenHandle Tween<T>(SetterFunction<T> setterFunction, float timeInSeconds, T to, object from, EasingFunction easingFunction = null, LoopType loopType = LoopType.Dont, GetterFunction<T> getterFunction = null) where T : struct
+  public static TweenHandle Tween<T>(SetterFunction<T> setterFunction, float timeInSeconds, T to, object from,
+                                     EasingFunction easingFunction = null,
+                                     LoopType loopType = LoopType.Dont,
+                                     GetterFunction<T> getterFunction = null) where T : struct
   {
-    return new EnumeratorTween(new RawLoopableTween<T>(setterFunction, timeInSeconds, to, from, easingFunction, loopType, getterFunction));
+    return new EnumeratorTween(
+        new RawLoopableTween<T>(setterFunction, timeInSeconds, to, from, easingFunction, loopType, getterFunction));
   }
 
-  public static TweenHandle Tween<U,T>(ValueTuple<U, string> targetProperty, float timeInSeconds, T to, object from = null, EasingFunction easingFunction = null, LoopType loopType = LoopType.Dont) where U : class where T : struct
+  public static TweenHandle Tween<U,T>(ValueTuple<U, string> targetProperty, float timeInSeconds, T to,
+                                       object from = null, EasingFunction easingFunction = null,
+                                       LoopType loopType = LoopType.Dont) where U : class where T : struct
   {
-    return new EnumeratorTween(new RawLoopableTween<T>(targetProperty, timeInSeconds, to, from, easingFunction, loopType));
+    return new EnumeratorTween(
+        new RawLoopableTween<T>(targetProperty, timeInSeconds, to, from, easingFunction, loopType));
   }
 
-  public static TweenHandle Tween<T>(object[] targetProperty, float timeInSeconds, T to, object from = null, EasingFunction easingFunction = null, LoopType loopType = LoopType.Dont) where T : struct
+  public static TweenHandle Tween<T>(object[] targetProperty, float timeInSeconds, T to, object from = null,
+                                     EasingFunction easingFunction = null,
+                                     LoopType loopType = LoopType.Dont) where T : struct
   {
-    return new EnumeratorTween(new RawLoopableTween<T>(targetProperty, timeInSeconds, to, from, easingFunction, loopType));
+    return new EnumeratorTween(
+        new RawLoopableTween<T>(targetProperty, timeInSeconds, to, from, easingFunction, loopType));
   }
 
 #region CustomLerpMethods
@@ -494,19 +504,24 @@ public static class Mabu
   {
     private RawTween<T> inner;
 
-    public RawLoopableTween(SetterFunction<T> setterFunction, float timeInSeconds, T to, object from, EasingFunction easingFunction = null, LoopType loopType = LoopType.Dont, GetterFunction<T> getterFunction = null)
+    public RawLoopableTween(SetterFunction<T> setterFunction, float timeInSeconds, T to, object from,
+                            EasingFunction easingFunction = null, LoopType loopType = LoopType.Dont,
+                            GetterFunction<T> getterFunction = null)
     {
       LoopType = loopType;
-      inner = new RawTween<T>(setterFunction, timeInSeconds, to, from, easingFunction, TweenPlayDirection.Forward, getterFunction);
+      inner = new RawTween<T>(
+          setterFunction, timeInSeconds, to, from, easingFunction, TweenPlayDirection.Forward, getterFunction);
     }
 
-    public RawLoopableTween(object[] targetProperty, float timeInSeconds, T to, object from = null, EasingFunction easingFunction = null, LoopType loopType = LoopType.Dont)
+    public RawLoopableTween(object[] targetProperty, float timeInSeconds, T to, object from = null,
+                            EasingFunction easingFunction = null, LoopType loopType = LoopType.Dont)
     {
       LoopType = loopType;
       inner = new RawTween<T>(targetProperty, timeInSeconds, to, from, easingFunction, TweenPlayDirection.Forward);
     }
 
-    public RawLoopableTween(ValueTuple<object, string> targetProperty, float timeInSeconds, T to, object from = null, EasingFunction easingFunction = null, LoopType loopType = LoopType.Dont)
+    public RawLoopableTween(ValueTuple<object, string> targetProperty, float timeInSeconds, T to, object from = null,
+                            EasingFunction easingFunction = null, LoopType loopType = LoopType.Dont)
     {
       LoopType = loopType;
       inner = new RawTween<T>(targetProperty, timeInSeconds, to, from, easingFunction, TweenPlayDirection.Forward);
@@ -548,17 +563,21 @@ public static class Mabu
       state = RawTweenState.Resetting;
     }
 
-    public RawTween(SetterFunction<T> setterFunction, float timeInSeconds, T to, object from, EasingFunction easingFunction = null, TweenPlayDirection playDirection = TweenPlayDirection.Forward, GetterFunction<T> getterFunction = null)
+    public RawTween(SetterFunction<T> setterFunction, float timeInSeconds, T to, object from,
+                    EasingFunction easingFunction = null, TweenPlayDirection playDirection = TweenPlayDirection.Forward,
+                    GetterFunction<T> getterFunction = null)
     {
       inner = RawTweenImpl(setterFunction, timeInSeconds, to, from, easingFunction, playDirection);
     }
 
-    public RawTween(object[] targetProperty, float timeInSeconds, T to, object from = null, EasingFunction easingFunction = null, TweenPlayDirection playDirection = TweenPlayDirection.Forward)
+    public RawTween(object[] targetProperty, float timeInSeconds, T to, object from = null,
+                    EasingFunction easingFunction = null, TweenPlayDirection playDirection = TweenPlayDirection.Forward)
     {
       inner = RawTweenImpl(targetProperty, timeInSeconds, to, from, easingFunction, playDirection);
     }
 
-    public RawTween(ValueTuple<object, string> targetProperty, float timeInSeconds, T to, object from = null, EasingFunction easingFunction = null, TweenPlayDirection playDirection = TweenPlayDirection.Forward)
+    public RawTween(ValueTuple<object, string> targetProperty, float timeInSeconds, T to, object from = null,
+                    EasingFunction easingFunction = null, TweenPlayDirection playDirection = TweenPlayDirection.Forward)
     {
       inner = RawTweenImpl(targetProperty, timeInSeconds, to, from, easingFunction, playDirection);
     }
@@ -567,7 +586,10 @@ public static class Mabu
     // Create an empty IEnumerator to return from functions that return IEnumerator but don't yield.
     private static IEnumerator YieldBreak = new EmptyEnumerator();
 
-    private IEnumerator RawTweenImpl(SetterFunction<T> setterFunction, float timeInSeconds, T to, object from, EasingFunction easingFunction = null, TweenPlayDirection playDirection = TweenPlayDirection.Forward, GetterFunction<T> getterFunction = null)
+    private IEnumerator RawTweenImpl(SetterFunction<T> setterFunction, float timeInSeconds, T to, object from,
+                                     EasingFunction easingFunction = null,
+                                     TweenPlayDirection playDirection = TweenPlayDirection.Forward,
+                                     GetterFunction<T> getterFunction = null)
     {
       // Perform runtime checks of arguments.
       if (setterFunction == null)
@@ -586,12 +608,14 @@ public static class Mabu
         {
           warningString = "from is incorrect type (" + from.GetType().Name + ").";
         }
-        Debug.LogWarning(warningString + "from must be either a value of type " + typeof(T).Name + " or a getter function of type GetterFunction<" + typeof(T).Name + ">. Will not tween.");
+        Debug.LogWarning(warningString + "from must be either a value of type " + typeof(T).Name +
+                         " or a getter function of type GetterFunction<" + typeof(T).Name + ">. Will not tween.");
         yield break;
       }
       if((getterFunction != null) && !getterFunction.GetType().Equals(typeof(GetterFunction<T>)))
       {
-        Debug.LogWarning("getterFunction was provided, but it is not of type Func<" + typeof(T).Name + ">. Will not tween.");
+        Debug.LogWarning("getterFunction was provided, but it is not of type Func<" + typeof(T).Name +
+                         ">. Will not tween.");
         yield break;
       }
       // search in lerpMethodDic for a matching Lerp function.
@@ -610,7 +634,10 @@ public static class Mabu
         }
         else
         {
-          Debug.LogWarning("Type " + typeof(T).FullName + " has no static Lerp() function defined. Set a Lerp function of type System.Func<" + typeof(T).Name + "," + typeof(T).Name + ",float," + typeof(T).Name + "> using SetLerpFunction().");
+          Debug.LogWarning("Type " + typeof(T).FullName + 
+                           " has no static Lerp() function defined. Set a Lerp function of type System.Func<" +
+                           typeof(T).Name + "," + typeof(T).Name + ",float," + typeof(T).Name +
+                           "> using SetLerpFunction().");
           yield break;
         }
       }
@@ -686,31 +713,39 @@ public static class Mabu
       }      
     }
 
-    private IEnumerator RawTweenImpl(object[] targetProperty, float timeInSeconds, T to, object from = null, EasingFunction easingFunction = null, TweenPlayDirection playDirection = TweenPlayDirection.Forward)
+    private IEnumerator RawTweenImpl(object[] targetProperty, float timeInSeconds, T to, object from = null,
+                                     EasingFunction easingFunction = null,
+                                     TweenPlayDirection playDirection = TweenPlayDirection.Forward)
     {
       if(targetProperty.Length != 2)
       {
-        Debug.LogWarning("When passing an an object array as targetProperty, the array is expected to have exactly two elements.");
+        Debug.LogWarning("When passing an an object array as targetProperty, the array is expected to have exactly "+
+                         "two elements.");
         return YieldBreak;
       }
-      // targetProperty expected to be an obnect with first item the target object and second item the targetPropertyName.
+      // targetProperty expected to be an obnect with first item the target object and second item the
+      // targetPropertyName.
       object target = targetProperty[0];
       if(target == null || !target.GetType().IsValueType)
       {
-        Debug.LogWarning("When passing an object array as targetProperty, the first item must be a reference type and not null.");
+        Debug.LogWarning("When passing an object array as targetProperty, the first item must be a reference type "+
+                         "and not null.");
         return YieldBreak;
       }
       string propertyName = targetProperty[1] as string;
       if(string.IsNullOrEmpty(propertyName))
       {
-        Debug.LogWarning("When passing an an object array as targetProperty, the second item must be a string containing the property name.");
+        Debug.LogWarning("When passing an an object array as targetProperty, the second item must be a string " +
+                         "containing the property name.");
         return YieldBreak;
       }
       return RawTweenImpl((target, propertyName), timeInSeconds, to, from, easingFunction, playDirection);
     }
 
     // Tween a property on some object.
-    private IEnumerator RawTweenImpl<U>(ValueTuple<U, string> targetProperty, float timeInSeconds, T to, object from = null, EasingFunction easingFunction = null, TweenPlayDirection playDirection = TweenPlayDirection.Forward) where U : class
+    private IEnumerator RawTweenImpl<U>(ValueTuple<U, string> targetProperty, float timeInSeconds, T to,
+                                        object from = null, EasingFunction easingFunction = null,
+                                        TweenPlayDirection playDirection = TweenPlayDirection.Forward) where U : class
     {
       U targetObject = targetProperty.Item1;
       string propertyName = targetProperty.Item2;
@@ -720,16 +755,19 @@ public static class Mabu
          Debug.LogWarning("target is null. Will not tween.");
          return YieldBreak;
       }
-      if (!targetObject.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).Any(p => p.Name == propertyName))
+      if (!targetObject.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).Any(
+              p => p.Name == propertyName))
       {
-        Debug.LogWarning("Object " + targetObject.ToString() + " does not contain a property named " + propertyName + ". Will not tween.");
+        Debug.LogWarning("Object " + targetObject.ToString() + " does not contain a property named " + propertyName +
+                         ". Will not tween.");
         return YieldBreak;
       }
       PropertyInfo propInfo = targetObject.GetType().GetProperty(propertyName);
       Type propType = propInfo.PropertyType;
       if (!propType.Equals(typeof(T)))
       {
-        Debug.LogWarning("Property " + propertyName + " on object " + targetObject.ToString() + " is of type " + propType.FullName + " but 'to' is of type " + to.GetType().FullName + ". Will not tween.");
+        Debug.LogWarning("Property " + propertyName + " on object " + targetObject.ToString() + " is of type " +
+                         propType.FullName + " but 'to' is of type " + to.GetType().FullName + ". Will not tween.");
         return YieldBreak;
       }
       SetterFunction<T> setterFunction = (T x) => { propInfo.SetValue(targetObject, x); };
@@ -947,7 +985,8 @@ public static class Mabu
 
       public static float InOut(float k)
       {
-        if ((k *= 2f) < 1f) return -0.5f * Mathf.Pow(2f, 10f * (k -= 1f)) * Mathf.Sin((k - 0.1f) * (2f * Mathf.PI) / 0.4f);
+        if ((k *= 2f) < 1f)
+          return -0.5f * Mathf.Pow(2f, 10f * (k -= 1f)) * Mathf.Sin((k - 0.1f) * (2f * Mathf.PI) / 0.4f);
         return Mathf.Pow(2f, -10f * (k -= 1f)) * Mathf.Sin((k - 0.1f) * (2f * Mathf.PI) / 0.4f) * 0.5f + 1f;
       }
     };
