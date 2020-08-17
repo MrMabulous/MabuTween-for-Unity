@@ -710,7 +710,7 @@ public static class Mabu
         easingFunction = Easing.Sinusoidal.InOut;
     
       yield return 0;  // after this yeld, the first iteration follows
-    ResetRelative:
+    // ResetRelative:
       T fromVal;
       T originalVal;
       if(from.GetType().Equals(typeof(T)))
