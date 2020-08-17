@@ -4,61 +4,39 @@ Copyright(c) 2020 Matthias Bühlmann, Mabulous GmbH. http://www.mabulous.com
 All rights reserved.
 */
 
-/*
- * To tween anything, there are two static methods that can be used. 
- * Both return an IEnumerator, to be used as Coroutine.
- * If a property of any C# object shall be animated, then the following Method can be used:
- * 
- * Tween(Tuple<object, string> targetProperty,
- *       float timeInSeconds,
- *       T to,
- *       object from = null,
- *       EasingFunction easingFunction = null,
- *       LoopType loopType = LoopType.Dont);
- * 
- * The first 3 arguments must be specified, the others are optional.
- * @targetObject a tuple consisting of a reference to the c# object containing the property
- *               to be animated plus the name of the property.
- * @propertyName the name of the Property that should be animated.
- * @timeInSeconds duration of the animation.
- * @to the target value of the property that should be animated
- * @from if specified, that's the value the property will be set to at the beginning of the tween.
- *     otherwise it will tween starting at the value the property had when calling this function.
- * @easingFunction the easing function to use. If null, Sinosoid ease-in-ease-out is used. See
- *         https://easings.net/ for an overview of different easing types.
- * @loopType if false, the tween ends when the 'to' value is reached. if it is true, the tween
- *     animates back to the start value before it ends.
- *            
- * Example usage:
- * 
- *         StartCoroutine(Tweener.TweenProperty(gameObject.transform, "position", 1.0f, Vector3.Up * 10));
- *         
- * This animates the global position of gameObject from it's current position to the
- * global position Vector3(0, 10, 0)
- *         
+/* general usage is: Mabu.Tween(what, duration, to, [from], [easingFunction], [loopType], [getterFunction]);
  *
+ * @what defines the value that should be animated. It can can either be a tuple (object, propertyname) or a
+ *       setter function of type SetterFunction<T> that takes one argument of type T (in the range of @from to @to)
+ *       and does something with it.
+ * @duration is the duration of the tween in seconds.
+ * @to is the target value to which the value should be animated.
+ * @from defines the value at which the animation should start. It can take one of three types:
+ *       - a value of type T, in this case that value will be set as the start
+ *       - null, in which case the start value is taken from the value the property will have when the tween is
+ *               started. This only works when @what is an (object, propertyname) tuple, not when it is a
+ *               setter function of type SetterFunction<T>
+ *       - a getter function of type GetterFunction<T>. It will be evaluated when the tween starts to get the start
+ *               value.
+ * @easingFunction one of many different easing functions defining motion curve. See https://easings.net/
+ *                 can be null, in which case sinusoidal ease-in-ease-out is used.
+ * @loopType defines what happens when the tween reaches the end. Possible Values are
+ *           - LoopType.Dont (the default): doesn't loop, the tween ends when it reaches the to value.
+ *           - LoopType.Loop: repeats the tween forwever, starting at the beginning with each loop
+ *           - LoopType.Reflect: After reaching the end, animates in reverse back to the start and ends then.
+ *           - LoopType.PingPong: Animates continuously forwards, then backwards etc.
+ * @getterFunction this is usually not required. it is only required when the @what of a subtween is defined using a
+ *                 setter function rather than a (object, propertyname) tuple AND the @from is NOT already of type
+ *                 GetterFunction<T> but a fixed value of type T AND the subtween is concatenated with other
+ *                 subtweens and might animated backwards (this is so the tween can query the value of the animated
+ *                 value before the tween starts, so that it can set it back there when animating in reverse).
  * 
  * 
- * If anything other than an object property should be animated (for example a value that can only be set
- * using a function call, or some Editor value or even some web api), then this more general Method can
- * be used:
- * 
- * Tween(SetterFunction<T> setterFunction,
- *       float timeInSeconds,
- *       T to,
- *       T from,
- *       EasingFunction easingFunction = null,
- *       LoopType loopType = LoopType.Dont);
- *     
- * @timeInSeconds, @to, @easingFfunction, @loopType and @startThisFrameAlready have the same meaning as
- *         with TweenProperty(...)
- *     
- * @from has the same meaning as with TweenProperty(...), however, it cannot be null.
- * @setterFunction is a Delegate function that takes a single argument of type T (the type of the value that
- *         shall be animated) and returns void. This delegate function will be called repeatedly by
- *         the tweener with interpolated values. The implementation should simply set the vaue of
- *         whatever it is that should be animated.
- * 
+ * SetterFunction<T> is any function (or lambda) that accepts one argument of type T and retruns void, so you can
+ *                   pass any such function as the @what argument to animate the variable.
+ *                   
+ * GetterFunction<T> is any function (or lambda) that has no input arguments and returns a value of type T, so you
+ *                   any such function as the @from argument and/or the @getterFunction argument. 
  * 
  * Example usage: Let's say you have some function to set the visibility of the menu and you want to Tween it
  * 
@@ -71,13 +49,13 @@ All rights reserved.
  * To do so, you need to define a setter function. Since SetUIVisibility already conforms to the setterFunction
  * signature, and GetUIVisibility to the getterFunction signature, you can use them directly as delegate
  * 
- *          StartCoroutine(Tweener.Tween(SetUIVisiblity, 0.5f, 0.0f, null, GetUIVisibility));
+ *          Mabu.Tween(SetUIVisiblity, 0.5f, 0.0f, GetUIVisibility));
  *
  * This will fade out the menu within 0.5 seconds using a Sinusoidal ease-in-ease-out animation. 
  * 
  * Alternatively you could also specify the @from value instead of providing the @getterFuncton:
  * 
- *          StartCoroutine(Tweener.Tween(SetUIVisiblity, 0.5f, 0.0f, 1.0f));
+ *          Mabu.Tween(SetUIVisiblity, 0.5f, 0.0f, 1.0f));
  *          
  * In this case the Menu will first be set to complete opacity (1.0f) if it isn't already, and then
  * faded out (0.0f)
@@ -92,7 +70,7 @@ All rights reserved.
  *           go2.transform.position = center + (go2.transform.position - center).normalized * d * 0.5f;
  *         }
  *         float currentDistance = (go1.transform.position - go2.transform.position).magnitude;
- *         StartCoroutine(Tweener.Tween(distanceSetter, 2.0f, 10.0f, currentDistance, null, Easing.Bounce.Out));
+ *         Mabu.Tween(distanceSetter, 2.0f, 10.0f, currentDistance, Easing.Bounce.Out));
  * 
  * This will create a 10 seconds animation that will Tween the two GameObjects move to a distance of 10.0 units from
  * each other.
@@ -117,6 +95,23 @@ All rights reserved.
  *           Mabu.SetLerpMethod(typeof(Rect), lerpRect);
  * 
  * After this, variables of type Rect can be animated using Tween(...); and TweenProperty(...);
+ * 
+ * If you want that Quaternions are interpolated using Slerp instead of Lerp (the default), you can also override
+ * the interpolation behaviour for them using this method.
+ * 
+ * 
+ * On Tween Chaining:
+ * You can chain tweens together using the + or +"= operator. This will return a concatenated tween that first tweens the
+ * left tween and then the right tween.
+ * Additionally to Tweens, you can concatenate in this way also YieldInstructions, Coroutines (they should NOT be started
+ * using StartCoroutine in this case, just concatenate the IEnumerator returned from the coroutine function directly) as
+ * well as functions and lambdas that take no argument. This allows you to easily define a sequence of animations with
+ * actions that should happen ac specific points of the overal animation. For example:
+ * 
+ * // this will first fade in the object 'menu' (provided that it has a property with getter and setter named "opacity"),
+ * then will toggle the application into fullscreen mode and then fade it out again.
+ * Mabu.Tween((menu, "opacity"), 1.0f, 1.0f) + () => { Screen.fullScreen = true; } + Mabu.Tween((menu, "opacity"), 1.0f, 0.0f);
+ * 
 */
 
 using System;
@@ -355,6 +350,15 @@ public static class Mabu
     public static TweenHandle operator +(TweenHandle first, YieldInstruction second)
         => first.Then(new EnumeratorTween(new PseudoReversableEnumerator(new YieldInstructionEnumerator(second))));
 
+    public static TweenHandle operator +(YieldInstruction first, TweenHandle second)
+        => new EnumeratorTween(new PseudoReversableEnumerator(new YieldInstructionEnumerator(first))).Then(second);
+
+    public static TweenHandle operator +(TweenHandle first, Action second)
+        => first.Then(new OneShotTween(second));
+
+    public static TweenHandle operator +(Action first, TweenHandle second)
+        => new OneShotTween(first).Then(second);
+
     public TweenHandle Then(TweenHandle next)
     {
       return new ChainedTween(this, next);
@@ -402,6 +406,35 @@ public static class Mabu
     public object Current { get { return moveNextCalled ? yi : null; } }
 
     public void Reset() { moveNextCalled = false; }
+  }
+
+  private class OneShotTween : TweenHandle
+  {
+    private Action action;
+    private bool loaded = true;
+
+    public OneShotTween(Action action) {
+      this.action = action;
+    }
+
+    public override bool Move(TweenPlayDirection dir)
+    {
+      if(loaded)
+      {
+        action.Invoke();
+      }
+      loaded = false;
+      return false;
+    }
+
+    public override void Reset(TweenPlayDirection dir)
+    {
+      loaded = true;
+    }
+
+    public override object Current { get { return null; } }
+
+    protected override IEnumerator GetInner() { return this; }
   }
 
   private class EnumeratorTween : TweenHandle

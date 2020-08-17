@@ -11,6 +11,11 @@ using UnityEngine;
 
 public class MabuTweenExample : MonoBehaviour
 {
+  private void LogMessage()
+  {
+    Debug.Log("Message1");
+  }
+
   // Start is called before the first frame update
   void Start()
   {
@@ -43,19 +48,28 @@ public class MabuTweenExample : MonoBehaviour
 
     // build one long tween by creating and concatinating many individual tweens using + and += operator.
 
-    // smooth motion
+    // smooth motion...
     Mabu.TweenHandle tween = Mabu.Tween((transform, "position"), 1.0f, new Vector3(0, 1, 0)) +
                              Mabu.Tween((transform, "position"), 1.0f, new Vector3(1, 1, 0)) +
                              Mabu.Tween((transform, "position"), 1.0f, new Vector3(1, 1, 1)) +
-                             Mabu.Tween((transform, "position"), 1.0f, new Vector3(0, 0, 0)) +
-                             new WaitForSeconds(0.3f); // you can concatenate YieldInstructions too.
+                             Mabu.Tween((transform, "position"), 1.0f, new Vector3(0, 0, 0));
+  
 
-    // jerky motion
+    // followed by jerky motion
     tween += Mabu.Tween((transform, "position"), 0.5f, new Vector3(0, 1, 0), null, Mabu.Easing.Bounce.Out) +
              Mabu.Tween((transform, "position"), 0.5f, new Vector3(1, 1, 0), null, Mabu.Easing.Bounce.Out) +
              Mabu.Tween((transform, "position"), 0.5f, new Vector3(1, 1, 1), null, Mabu.Easing.Bounce.Out) +
-             Mabu.Tween((transform, "position"), 0.5f, new Vector3(0, 0, 0), null, Mabu.Easing.Bounce.Out) +
-             new WaitForSeconds(0.3f);
+             Mabu.Tween((transform, "position"), 0.5f, new Vector3(0, 0, 0), null, Mabu.Easing.Bounce.Out);
+
+    // you can also concatenate YieldInstructions: 
+    tween += new WaitForSeconds(0.3f); // will make the tween pause at this point for 0.3 seconds before continuing.
+
+    // and even a function delegate:
+    tween += LogMessage;
+
+    // or directly a lambda expression:
+
+    tween += () => { Debug.Log("Message2"); };
 
     // animate orientation
     Quaternion current_rot = transform.rotation;
