@@ -209,19 +209,44 @@ public static class Mabu
       coroutineStarter = tweenManagerGO.AddComponent<CoroutineStarter>();
     }
 
-    public static void AddTween(TweenHandle tween)
+    public static void StartTween(TweenHandle tween)
     {
-      if(tween != null)
+      if(tween != null) {
+        if(coroutines.ContainsKey(tween))
+          StopTween(tween);
+        tween.Reset();
         coroutines[tween] = coroutineStarter.StartCoroutine(CoroutineWrapper(tween));
+      }
     }
 
-    public static void RemoveTween(TweenHandle tween)
+    public static void StopTween(TweenHandle tween)
     {
       if(tween != null) {
         Coroutine coroutine;
         if(coroutines.TryGetValue(tween, out  coroutine)) {
           coroutineStarter.StopCoroutine(coroutine);
           coroutines.Remove(tween);
+        }
+      }
+    }
+
+    public static void PauseTween(TweenHandle tween)
+    {
+      if(tween != null) {
+        Coroutine coroutine;
+        if(coroutines.TryGetValue(tween, out  coroutine)) {
+          coroutineStarter.StopCoroutine(coroutine);
+        }
+      }
+    }
+
+    public static void UnpauseTween(TweenHandle tween)
+    {
+      if(tween != null) {
+        Coroutine coroutine;
+        if(coroutines.TryGetValue(tween, out  coroutine)) {
+          coroutineStarter.StopCoroutine(coroutine); // just to be sure it's stopped
+          coroutines[tween] = coroutineStarter.StartCoroutine(tween);
         }
       }
     }
@@ -243,7 +268,7 @@ public static class Mabu
         }
         else
         {
-          RemoveTween(tween);
+          StopTween(tween);
           yield break;
         }
       }
@@ -363,6 +388,11 @@ public static class Mabu
     {
       return new ChainedTween(this, next);
     }
+
+    public void Restart()
+    {
+      TweenManager.StartTween(this);
+    }
   }
 
   private class PseudoReversableEnumerator : ReversableEnumerator
@@ -443,7 +473,7 @@ public static class Mabu
 
     public EnumeratorTween(IReversableEnumerator en) {
       inner = en;
-      TweenManager.AddTween(this);
+      TweenManager.StartTween(this);
     }
 
     protected override IEnumerator GetInner() { return inner; }
@@ -515,9 +545,9 @@ public static class Mabu
     public ChainedTween(TweenHandle first, TweenHandle second)
     {
       inner = new CompoundReversableEnumerator(first, second);
-      TweenManager.RemoveTween(first);
-      TweenManager.RemoveTween(second);
-      TweenManager.AddTween(this);
+      TweenManager.StopTween(first);
+      TweenManager.StopTween(second);
+      TweenManager.StartTween(this);
     }
 
     protected override IEnumerator GetInner() { return inner; }
