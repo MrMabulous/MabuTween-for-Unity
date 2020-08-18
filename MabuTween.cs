@@ -141,7 +141,43 @@ public static class Mabu
     Forward = 1,
     Reverse = -1
   }
-
+  
+  /// <summary>
+  /// Creates and starts a new Tween.
+  /// </summary>
+  /// <param name="setterFunction">
+  /// This function is executed on each step of the tween and passed the tweened value.
+  /// </param>
+  /// <param name="timeInSeconds">
+  /// The duration of the tween.
+  /// </param>
+  /// <param name="to">
+  /// The value towards which the tweened value is animated.
+  /// </param>
+  /// <param name="from">
+  /// An object that defines the start value of the tween. This can either be a raw value of type T or a function
+  /// that takes no arguments and returns a value of type T. in the latter case, the function will be called when the
+  /// tween begins to get the start value.
+  /// </param>
+  /// <param name="easingFunction">
+  /// A function that defines the interpolation of the <param ref="from"/> and <param ref="to"/> values. Use one of the
+  /// functions in Mabu.Easing or provide your own. See https://easings.net/ for the predefined interpolations. If this
+  /// parameter is not defined or null is passed, the Sinusodial ease-in-ease-out is used for the tween.
+  /// </param>
+  /// <param name="loopType">
+  /// How the tween is looped.
+  /// LoopType.Dont (the default), does not loop the tween.
+  /// LoopType.Loop loops the tween continuously until it is stopped.
+  /// LoopType.Reflect plays the tween one time regularly and then one time in reverse.
+  /// LoopType.PingPong play the tween continuously forwards and backwards.
+  /// </param>
+  /// <param name="getterFunction">
+  /// If <param ref="from"/> isn't already a getter function, then a getter function can be specified here to allow the
+  /// tween to reset the tweened value after playing in reverse to whatever it was before the tween started.
+  /// </param>
+  /// <returns>
+  /// A <see cref="TweenHandle"/> through which the tween can be stopped prematurely or concatenated with other tweens.
+  /// </returns>
   public static TweenHandle Tween<T>(SetterFunction<T> setterFunction, float timeInSeconds, T to, object from,
                                      EasingFunction easingFunction = null,
                                      LoopType loopType = LoopType.Dont,
@@ -151,6 +187,40 @@ public static class Mabu
         new RawLoopableTween<T>(setterFunction, timeInSeconds, to, from, easingFunction, loopType, getterFunction));
   }
 
+  /// <summary>
+  /// Creates and starts a new Tween.
+  /// </summary>
+  /// <param name="targetProperty">
+  /// This is a tuple that defines the value that shall be animated. The first member is the object owning the value
+  /// and the second member is the name of the public property on this object that shall be animated.
+  /// </param>
+  /// <param name="timeInSeconds">
+  /// The duration of the tween.
+  /// </param>
+  /// <param name="to">
+  /// The value towards which the tweened value is animated.
+  /// </param>
+  /// <param name="from">
+  /// An object that defines the start value of the tween. This can be null, in which case the current value of the
+  /// property is taken as start value or the tween.
+  /// Otherwise it can either be a raw value of type T or a function that takes no arguments and returns a value of
+  /// type T. in the latter case, the function will be called when the tween begins to get the start value.
+  /// </param>
+  /// <param name="easingFunction">
+  /// A function that defines the interpolation of the <param ref="from"/> and <param ref="to"/> values. Use one of the
+  /// functions in Mabu.Easing or provide your own. See https://easings.net/ for the predefined interpolations. If this
+  /// parameter is not defined or null is passed, the Sinusodial ease-in-ease-out is used for the tween.
+  /// </param>
+  /// <param name="loopType">
+  /// How the tween is looped.
+  /// LoopType.Dont (the default), does not loop the tween.
+  /// LoopType.Loop loops the tween continuously until it is stopped.
+  /// LoopType.Reflect plays the tween one time regularly and then one time in reverse.
+  /// LoopType.PingPong play the tween continuously forwards and backwards.
+  /// </param>
+  /// <returns>
+  /// A <see cref="TweenHandle"/> through which the tween can be stopped prematurely or concatenated with other tweens.
+  /// </returns>
   public static TweenHandle Tween<U,T>(ValueTuple<U, string> targetProperty, float timeInSeconds, T to,
                                        object from = null, EasingFunction easingFunction = null,
                                        LoopType loopType = LoopType.Dont) where U : class where T : struct
@@ -159,6 +229,41 @@ public static class Mabu
         new RawLoopableTween<T>(targetProperty, timeInSeconds, to, from, easingFunction, loopType));
   }
 
+  /// <summary>
+  /// Creates and starts a new Tween.
+  /// </summary>
+  /// <param name="targetProperty">
+  /// This is an object array with two elements that defines the value that shall be animated. The first element is the
+  /// object owning the value and the second member is the name of the public property on this object that shall be
+  /// animated.
+  /// </param>
+  /// <param name="timeInSeconds">
+  /// The duration of the tween.
+  /// </param>
+  /// <param name="to">
+  /// The value towards which the tweened value is animated.
+  /// </param>
+  /// <param name="from">
+  /// An object that defines the start value of the tween. This can be null, in which case the current value of the
+  /// property is taken as start value or the tween.
+  /// Otherwise it can either be a raw value of type T or a function that takes no arguments and returns a value of
+  /// type T. in the latter case, the function will be called when the tween begins to get the start value.
+  /// </param>
+  /// <param name="easingFunction">
+  /// A function that defines the interpolation of the <param ref="from"/> and <param ref="to"/> values. Use one of the
+  /// functions in Mabu.Easing or provide your own. See https://easings.net/ for the predefined interpolations. If this
+  /// parameter is not defined or null is passed, the Sinusodial ease-in-ease-out is used for the tween.
+  /// </param>
+  /// <param name="loopType">
+  /// How the tween is looped.
+  /// LoopType.Dont (the default), does not loop the tween.
+  /// LoopType.Loop loops the tween continuously until it is stopped.
+  /// LoopType.Reflect plays the tween one time regularly and then one time in reverse.
+  /// LoopType.PingPong play the tween continuously forwards and backwards.
+  /// </param>
+  /// <returns>
+  /// A <see cref="TweenHandle"/> through which the tween can be stopped prematurely or concatenated with other tweens.
+  /// </returns>
   public static TweenHandle Tween<T>(object[] targetProperty, float timeInSeconds, T to, object from = null,
                                      EasingFunction easingFunction = null,
                                      LoopType loopType = LoopType.Dont) where T : struct
@@ -167,17 +272,65 @@ public static class Mabu
         new RawLoopableTween<T>(targetProperty, timeInSeconds, to, from, easingFunction, loopType));
   }
 
-#region CustomLerpMethods
-
-  private static Dictionary<Type, Delegate> lerpMethodDic = new Dictionary<Type, Delegate>();
-
-  static Mabu()
+  /// <summary>
+  /// A handle representing a tween.
+  /// </summary>
+  public abstract class TweenHandle : LoopableEnumerator
   {
-    // Register lerpMethods for float and double.
-    SetLerpMethod((float a, float b, float t) => { return Mathf.Lerp(a, b, t); });
-    SetLerpMethod((double a, double b, float t) => { return a + (b - a) * Mathf.Clamp01(t); });
+    /// <summary>
+    /// Stops the original two tweens and creates and starts a concatenated tween.
+    /// </summary>
+    public static TweenHandle operator +(TweenHandle first, TweenHandle second)
+        => first.Then(second);
+
+    /// <summary>
+    /// Concatenates a Tween and a YieldInstruction.
+    /// </summary>
+    public static TweenHandle operator +(TweenHandle first, YieldInstruction second)
+        => first.Then(new EnumeratorTween(new PseudoReversableEnumerator(new YieldInstructionEnumerator(second))));
+
+    /// <summary>
+    /// Concatenates a YieldInstruction and a Tween.
+    /// </summary>
+    public static TweenHandle operator +(YieldInstruction first, TweenHandle second)
+        => new EnumeratorTween(new PseudoReversableEnumerator(new YieldInstructionEnumerator(first))).Then(second);
+
+    /// <summary>
+    /// Concatenates a Tween with an Action, executing the Action when the tween ended.
+    /// </summary>
+    public static TweenHandle operator +(TweenHandle first, Action second)
+        => first.Then(new OneShotTween(second));
+
+    /// <summary>
+    /// Concatenates an Action and a tween, executing the Action beffore the tween starts.
+    /// </summary>
+    public static TweenHandle operator +(Action first, TweenHandle second)
+        => new OneShotTween(first).Then(second);
+
+    /// <summary>
+    /// Restarts the tween.
+    /// </summary>
+    public void Restart()
+    {
+      TweenManager.StartTween(this);
+    }
+
+    /// <summary>
+    /// Stops the tween prematurely. This method does not have to be called explicitely, since a tween is
+    /// automatically stopped and discarded when it ends, but can be used to prevent a tween rom playing or to
+    /// stop it while it plays.
+    /// </summary>
+    public void Stop()
+    {
+      TweenManager.StopTween(this);
+    }
+    protected TweenHandle Then(TweenHandle next)
+    {
+      return new ChainedTween(this, next);
+    }
   }
 
+#region CustomLerpMethods
   // Define a Lerp method in order to animate other types of variables than the ones supported by default.
   public static void SetLerpMethod<T>(LerpFunction<T> lerpMethod) where T : struct
   {
@@ -191,8 +344,15 @@ public static class Mabu
 
 #endregion
 
+#region IMPL
+  static Mabu()
+  {
+    // Register lerpMethods for float and double.
+    SetLerpMethod((float a, float b, float t) => { return Mathf.Lerp(a, b, t); });
+    SetLerpMethod((double a, double b, float t) => { return a + (b - a) * Mathf.Clamp01(t); });
+  }
 #region TweenManager
-
+  private static Dictionary<Type, Delegate> lerpMethodDic = new Dictionary<Type, Delegate>();
   private static class TweenManager
   {
     private class CoroutineStarter : MonoBehaviour { }
@@ -366,35 +526,6 @@ public static class Mabu
 #endregion
 
 #region Tween
-
-  public abstract class TweenHandle : LoopableEnumerator
-  {
-    public static TweenHandle operator +(TweenHandle first, TweenHandle second)
-        => first.Then(second);
-
-    public static TweenHandle operator +(TweenHandle first, YieldInstruction second)
-        => first.Then(new EnumeratorTween(new PseudoReversableEnumerator(new YieldInstructionEnumerator(second))));
-
-    public static TweenHandle operator +(YieldInstruction first, TweenHandle second)
-        => new EnumeratorTween(new PseudoReversableEnumerator(new YieldInstructionEnumerator(first))).Then(second);
-
-    public static TweenHandle operator +(TweenHandle first, Action second)
-        => first.Then(new OneShotTween(second));
-
-    public static TweenHandle operator +(Action first, TweenHandle second)
-        => new OneShotTween(first).Then(second);
-
-    public TweenHandle Then(TweenHandle next)
-    {
-      return new ChainedTween(this, next);
-    }
-
-    public void Restart()
-    {
-      TweenManager.StartTween(this);
-    }
-  }
-
   private class PseudoReversableEnumerator : ReversableEnumerator
   {
     // Wraps a regular IEnumerator and iterating always forward
@@ -508,7 +639,7 @@ public static class Mabu
         current = second;
       }
     }
-    
+      
     public virtual object Current { get { return current.Current; } }
 
     public virtual bool Move(TweenPlayDirection dir)
@@ -517,7 +648,7 @@ public static class Mabu
       if(!moved)
       {
         if((dir == TweenPlayDirection.Reverse && current == first) ||
-           (dir == TweenPlayDirection.Forward && current == second))
+          (dir == TweenPlayDirection.Forward && current == second))
         {
           return false;
         }
@@ -613,7 +744,7 @@ public static class Mabu
     {
       currentPlayDirection = dir;
       if((state == RawTweenState.RightEnd && currentPlayDirection == TweenPlayDirection.Forward) ||
-         (state == RawTweenState.LeftEnd && currentPlayDirection == TweenPlayDirection.Reverse))
+        (state == RawTweenState.LeftEnd && currentPlayDirection == TweenPlayDirection.Reverse))
       {
         return false;
       }
@@ -650,9 +781,9 @@ public static class Mabu
     private static IEnumerator YieldBreak = new EmptyEnumerator();
 
     private IEnumerator RawTweenImpl(SetterFunction<T> setterFunction, float timeInSeconds, T to, object from,
-                                     EasingFunction easingFunction = null,
-                                     TweenPlayDirection playDirection = TweenPlayDirection.Forward,
-                                     GetterFunction<T> getterFunction = null)
+                                    EasingFunction easingFunction = null,
+                                    TweenPlayDirection playDirection = TweenPlayDirection.Forward,
+                                    GetterFunction<T> getterFunction = null)
     {
       // Perform runtime checks of arguments.
       if (setterFunction == null)
@@ -672,13 +803,13 @@ public static class Mabu
           warningString = "from is incorrect type (" + from.GetType().Name + ").";
         }
         Debug.LogWarning(warningString + "from must be either a value of type " + typeof(T).Name +
-                         " or a getter function of type GetterFunction<" + typeof(T).Name + ">. Will not tween.");
+                        " or a getter function of type GetterFunction<" + typeof(T).Name + ">. Will not tween.");
         yield break;
       }
       if((getterFunction != null) && !getterFunction.GetType().Equals(typeof(GetterFunction<T>)))
       {
         Debug.LogWarning("getterFunction was provided, but it is not of type Func<" + typeof(T).Name +
-                         ">. Will not tween.");
+                        ">. Will not tween.");
         yield break;
       }
       // search in lerpMethodDic for a matching Lerp function.
@@ -698,9 +829,9 @@ public static class Mabu
         else
         {
           Debug.LogWarning("Type " + typeof(T).FullName + 
-                           " has no static Lerp() function defined. Set a Lerp function of type System.Func<" +
-                           typeof(T).Name + "," + typeof(T).Name + ",float," + typeof(T).Name +
-                           "> using SetLerpFunction().");
+                          " has no static Lerp() function defined. Set a Lerp function of type System.Func<" +
+                          typeof(T).Name + "," + typeof(T).Name + ",float," + typeof(T).Name +
+                          "> using SetLerpFunction().");
           yield break;
         }
       }
@@ -708,7 +839,7 @@ public static class Mabu
       // Use sinusoidal easing if no easing function has been provided
       if (easingFunction == null)
         easingFunction = Easing.Sinusoidal.InOut;
-    
+      
       yield return 0;  // after this yeld, the first iteration follows
     // ResetRelative:
       T fromVal;
@@ -734,7 +865,7 @@ public static class Mabu
       {
         originalVal = fromVal;
       }
-    
+      
     Reset:
       state = RawTweenState.LeftEnd;
       float tweenTime = 0;
@@ -751,8 +882,8 @@ public static class Mabu
         tweenTime = Mathf.Clamp(tweenTime, 0, timeInSeconds);
         t = tweenTime / timeInSeconds;
         if(state == RawTweenState.Running ||
-           (state == RawTweenState.LeftEnd && t > 0.0f) ||
-           (state == RawTweenState.RightEnd && t < 1.0f))
+          (state == RawTweenState.LeftEnd && t > 0.0f) ||
+          (state == RawTweenState.RightEnd && t < 1.0f))
         {
           float tweenValue = easingFunction(t);
           T newValue = lerpMethod(fromVal, to, tweenValue);
@@ -777,13 +908,13 @@ public static class Mabu
     }
 
     private IEnumerator RawTweenImpl(object[] targetProperty, float timeInSeconds, T to, object from = null,
-                                     EasingFunction easingFunction = null,
-                                     TweenPlayDirection playDirection = TweenPlayDirection.Forward)
+                                    EasingFunction easingFunction = null,
+                                    TweenPlayDirection playDirection = TweenPlayDirection.Forward)
     {
       if(targetProperty.Length != 2)
       {
         Debug.LogWarning("When passing an an object array as targetProperty, the array is expected to have exactly "+
-                         "two elements.");
+                        "two elements.");
         return YieldBreak;
       }
       // targetProperty expected to be an obnect with first item the target object and second item the
@@ -792,14 +923,14 @@ public static class Mabu
       if(target == null || !target.GetType().IsValueType)
       {
         Debug.LogWarning("When passing an object array as targetProperty, the first item must be a reference type "+
-                         "and not null.");
+                        "and not null.");
         return YieldBreak;
       }
       string propertyName = targetProperty[1] as string;
       if(string.IsNullOrEmpty(propertyName))
       {
         Debug.LogWarning("When passing an an object array as targetProperty, the second item must be a string " +
-                         "containing the property name.");
+                        "containing the property name.");
         return YieldBreak;
       }
       return RawTweenImpl((target, propertyName), timeInSeconds, to, from, easingFunction, playDirection);
@@ -815,14 +946,14 @@ public static class Mabu
       // Perform runtime checks whether the property can be tweened.
       if(targetObject == null)
       {
-         Debug.LogWarning("target is null. Will not tween.");
-         return YieldBreak;
+        Debug.LogWarning("target is null. Will not tween.");
+        return YieldBreak;
       }
       if (!targetObject.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).Any(
               p => p.Name == propertyName))
       {
         Debug.LogWarning("Object " + targetObject.ToString() + " does not contain a property named " + propertyName +
-                         ". Will not tween.");
+                        ". Will not tween.");
         return YieldBreak;
       }
       PropertyInfo propInfo = targetObject.GetType().GetProperty(propertyName);
@@ -830,7 +961,7 @@ public static class Mabu
       if (!propType.Equals(typeof(T)))
       {
         Debug.LogWarning("Property " + propertyName + " on object " + targetObject.ToString() + " is of type " +
-                         propType.FullName + " but 'to' is of type " + to.GetType().FullName + ". Will not tween.");
+                        propType.FullName + " but 'to' is of type " + to.GetType().FullName + ". Will not tween.");
         return YieldBreak;
       }
       SetterFunction<T> setterFunction = (T x) => { propInfo.SetValue(targetObject, x); };
@@ -843,6 +974,7 @@ public static class Mabu
     }
   }
 #endregion
+#endregion  //IMPL
 
 #region Easing
   public class Easing
