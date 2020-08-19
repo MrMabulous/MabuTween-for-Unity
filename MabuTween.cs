@@ -296,6 +296,26 @@ public static class Mabu
         => new EnumeratorTween(new PseudoReversableEnumerator(new YieldInstructionEnumerator(first))).Then(second);
 
     /// <summary>
+    /// Concatenates a Tween and a IEnumerator.
+    /// </summary>
+    public static TweenHandle operator +(TweenHandle first, IEnumerator second) {
+      TweenHandle secondTween = (second is TweenHandle)
+                                ? second as TweenHandle
+                                : new EnumeratorTween(new PseudoReversableEnumerator(second));
+      return first.Then(secondTween);
+    }
+
+    /// <summary>
+    /// Concatenates a IEnumerator and a Tween.
+    /// </summary>
+    public static TweenHandle operator +(IEnumerator first, TweenHandle second) {
+      TweenHandle firstTween = (first is TweenHandle)
+                               ? first as TweenHandle
+                               : new EnumeratorTween(new PseudoReversableEnumerator(first));
+        return firstTween.Then(second);
+    }
+
+    /// <summary>
     /// Concatenates a Tween with an Action, executing the Action when the tween ended.
     /// </summary>
     public static TweenHandle operator +(TweenHandle first, Action second)
