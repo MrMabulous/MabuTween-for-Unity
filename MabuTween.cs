@@ -561,7 +561,10 @@ public static class Mabu
 
     public override void Reset(TweenPlayDirection direction)
     {
-      inner.Reset();
+      try {
+        inner.Reset();
+      } catch  (Exception) {
+      }
     }
 
     protected override IEnumerator GetInner() { return inner; }
