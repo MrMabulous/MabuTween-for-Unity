@@ -331,7 +331,8 @@ public static class Mabu
     /// Restarts the tween.
     /// </summary>
     public void Restart()
-    {
+    { 
+      this.Reset();
       TweenManager.StartTween(this);
     }
 
@@ -344,6 +345,14 @@ public static class Mabu
     {
       TweenManager.StopTween(this);
     }
+
+    /// <summary>
+    /// Returns true while this Tween is playing, and false after it ended or has otherwise been stoped.
+    /// </summary>
+    public bool IsPlaying() {
+      return TweenManager.IsPlaying(this);
+    }
+
     protected TweenHandle Then(TweenHandle next)
     {
       return new ChainedTween(this, next);
@@ -379,7 +388,6 @@ public static class Mabu
 
     private static GameObject tweenManagerGO;
     private static Dictionary<TweenHandle, Coroutine> coroutines = new Dictionary<TweenHandle, Coroutine>();
-    private static List<TweenHandle> deadTweens = new List<TweenHandle>();
     private static CoroutineStarter coroutineStarter;
 
     static TweenManager()
@@ -394,7 +402,6 @@ public static class Mabu
       if(tween != null) {
         if(coroutines.ContainsKey(tween))
           StopTween(tween);
-        tween.Reset();
         coroutines[tween] = coroutineStarter.StartCoroutine(CoroutineWrapper(tween));
       }
     }
@@ -410,25 +417,8 @@ public static class Mabu
       }
     }
 
-    public static void PauseTween(TweenHandle tween)
-    {
-      if(tween != null) {
-        Coroutine coroutine;
-        if(coroutines.TryGetValue(tween, out  coroutine)) {
-          coroutineStarter.StopCoroutine(coroutine);
-        }
-      }
-    }
-
-    public static void UnpauseTween(TweenHandle tween)
-    {
-      if(tween != null) {
-        Coroutine coroutine;
-        if(coroutines.TryGetValue(tween, out  coroutine)) {
-          coroutineStarter.StopCoroutine(coroutine); // just to be sure it's stopped
-          coroutines[tween] = coroutineStarter.StartCoroutine(tween);
-        }
-      }
+    public static bool IsPlaying(TweenHandle tween) {
+      return coroutines.ContainsKey(tween);
     }
 
     private static IEnumerator CoroutineWrapper(TweenHandle tween)
